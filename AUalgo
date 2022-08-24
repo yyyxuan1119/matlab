@@ -1,0 +1,106 @@
+clear all;
+close all;
+clc;
+%%%%% 数据
+load AUSLAN;%%%%导入原始数据
+D=eye(22,1140);%%% 
+for  k=1:1:1140%%%样本
+A=mts.train{1,1};
+B=mts.train{1,k};
+m=size(A,2);
+n=size(B,2);
+if(m<=n)
+      B(:,m+1:n)=[];  
+else
+      A(:,n+1:m)=[];          
+end
+E{k}=A-B; 
+D(:,k)=sqrt(sum(E{k}.^2,2));
+end
+C=sort(D,2);
+C(:,1)=[];
+K=2;
+MIN=C(:,1:1:K);
+MAX=C(:,m-K:1:m-1);
+%MAX=C(:,k-K:1:k-1); %%CMU数据集使用
+AMIN=sum(MIN,2)/2;
+AMAX=sum(MAX,2)/2;
+I=AMAX./AMIN;
+[I1 I2]=sort(I,1,'descend');
+i=1;
+a=0;
+b=sum(I);
+k=22;%%%特征
+for i=1:1:k
+    a=a+I(i)/b;
+    fprintf('符合的值为%f\n',I1(i))
+    fprintf('对应的属性为%d\n',I2(i))
+    if a<=0.8
+        continue
+    end
+    break
+end
+%%%数据集有空缺，先删除9、19、21
+for num=1:1:1140%%%%改样本量
+    mts.train{num}(9,:)=[];
+    mts.train{num}(18,:)=[];
+    mts.train{num}(19,:)=[];%%%%这里需要判读
+end                          %把原始数据删除不重要的属性
+D=eye(19,1140);%%% 
+for  k=1:1:1140%%%样本
+A=mts.train{1,1};
+B=mts.train{1,k};
+m=size(A,2);
+n=size(B,2);
+if(m<=n)
+      B(:,m+1:n)=[];  
+else
+      A(:,n+1:m)=[];          
+end
+E{k}=A-B; 
+D(:,k)=sqrt(sum(E{k}.^2,2));
+end
+C=sort(D,2);
+C(:,1)=[];
+K=2;
+MIN=C(:,1:1:K);
+MAX=C(:,m-K:1:m-1);
+%MAX=C(:,k-K:1:k-1); %%CMU数据集使用
+AMIN=sum(MIN,2)/2;
+AMAX=sum(MAX,2)/2;
+I=AMAX./AMIN;
+[I1 I2]=sort(I,1,'descend');
+i=1;
+a=0;
+b=sum(I);
+k=19;%%%特征
+for i=1:1:k
+    a=a+I(i)/b;
+    fprintf('符合的值为%f\n',I1(i))
+    fprintf('对应的属性为%d\n',I2(i))
+    if a<=0.8
+        continue
+    end
+    break
+end
+%%训练集删除不显著的特征
+for num=1:1:1140%%%%改样本量
+    mts.train{num}(8,:)=[];
+    mts.train{num}(10,:)=[];%%%%这里需要判读
+    mts.train{num}(10,:)=[];
+    mts.train{num}(10,:)=[];
+    mts.train{num}(11,:)=[];%%%%这里需要判读
+    mts.train{num}(11,:)=[];
+end
+%%%测试集删去
+for num=1:1:1425%%%
+    mts.test{num}(8,:)=[];
+    mts.test{num}(8,:)=[];
+    mts.test{num}(9,:)=[];
+    mts.test{num}(9,:)=[];
+    mts.test{num}(9,:)=[];%%%%这里需要判读
+    mts.test{num}(10,:)=[];
+    mts.test{num}(10,:)=[];
+    mts.test{num}(12,:)=[];%%%%这里需要判读
+    mts.test{num}(13,:)=[];
+end 
